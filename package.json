@@ -23,7 +23,9 @@
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.1.13",
+    "@types/node-telegram-bot-api": "^0.64.13",
     "hbs": "^4.2.0",
+    "node-telegram-bot-api": "^0.67.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
