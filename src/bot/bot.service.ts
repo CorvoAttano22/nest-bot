@@ -1,46 +1,60 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import dotenv from 'dotenv';
+import * as TelegramBot from 'node-telegram-bot-api';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Injectable()
 export class BotService implements OnModuleInit {
+  private bot: TelegramBot;
+
   onModuleInit() {
-    this.botMessage();
+    this.initBot();
   }
 
-  botMessage() {
-    process.env.NTBA_FIX_319 = '1';
-    const TelegramBot = require('node-telegram-bot-api');
-
+  private initBot() {
     const token = process.env.BOT_TOKEN;
 
-    const bot = new TelegramBot(token, { polling: true });
+    if (!token) {
+      throw new Error('BOT_TOKEN is missing');
+    }
 
-    bot.on('message', (msg) => {
-      let Hi = 'hi';
-      if (msg.text.toString().toLowerCase().indexOf(Hi) === 0) {
-        bot.sendMessage(
-          msg.from.id,
-          'Hello ' +
-            msg.from.first_name +
-            ' what would you like to know about me ?',
-        );
-      }
-
-      let response = 'Who are you';
-      if (msg.text.toString().toLowerCase().includes('who')) {
-        bot.sendMessage(
-          msg.chat.id,
-          'I am an intelligent telegram robot, built with Nest.js. Thanks for asking',
-        );
-      }
-
-      let response2 = 'Do you love JavaScript';
-      if (msg.text.toString().toLowerCase().includes('javascript')) {
-        bot.sendMessage(
-          msg.from.id,
-          'Oh, did I hear you say JavaScript? \n I really love JavaScript',
-        );
-      }
+    this.bot = new TelegramBot(token, {
+      polling: true,
     });
+
+    console.log('Telegram bot started');
+
+    this.bot.on('message', (msg) => {
+      this.handleMessage(msg);
+    });
+  }
+
+  private handleMessage(msg: TelegramBot.Message) {
+    const text = msg.text?.toLowerCase();
+    const chatId = msg.chat.id;
+
+    if (!text) return;
+
+    if (text.startsWith('hi')) {
+      this.bot.sendMessage(
+        chatId,
+        `Hello ${msg.from?.first_name ?? 'there'}`
+      );
+    }
+
+    if (text.includes('who')) {
+      this.bot.sendMessage(
+        chatId,
+        'I am a NestJS Telegram bot.'
+      );
+    }
+
+    if (text.includes('javascript')) {
+      this.bot.sendMessage(
+        chatId,
+        'Yes, I love JavaScript.'
+      );
+    }
   }
 }
